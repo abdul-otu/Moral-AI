@@ -27,7 +27,13 @@ for i in range(num_agents):
 winning_agents = {}
 running = True
 
-num_agents_to_win = int(input("Enter the number of agents required to win: "))
+# set the other agents' targets for each agent
+for agent in agents:
+    agent.set_other_agents_targets(agents)
+
+
+#num_agents_to_win = int(input("Enter the number of agents required to win: "))
+num_agents_to_win =5
 font = pygame.font.SysFont(None, 30)
 
 while running:
@@ -67,7 +73,7 @@ while running:
         screen.blit(text_surface, text_rect)
     
     pygame.display.update()
-    pygame.time.wait(100)
+    pygame.time.wait(10)
 
 pygame.time.wait(1000)
 pygame.quit()

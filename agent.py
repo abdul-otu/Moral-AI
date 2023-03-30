@@ -13,6 +13,9 @@ class Agent:
         self.need_to_visit = []
         self.append_coordinates(grid_size, 5)
         self.num_targets_to_win = 0
+        self.other_targets = {}
+        self.target_coordinates = []
+        self.messages = []
 
     def append_coordinates(self, grid_size, detect_range):
         for x in range(detect_range, grid_size, detect_range):
@@ -20,6 +23,18 @@ class Agent:
                 self.need_to_visit.append((x, y))
         random.shuffle(self.need_to_visit)
 
+    def set_other_agents_targets(self, agents):
+        # update the dictionary with other agents' targets
+        for agent in agents:
+            if agent != self:
+                self.other_targets[agent] = agent.targets
+
+    def send_target_location(self, target, agent):
+        remove = target
+        agent.messages.append(target)
+        for agent, targets in self.other_targets.items():
+            self.other_targets[agent] = [target for target in targets if target != remove]
+        
     def get_id(self):
         return self.id
     
@@ -38,6 +53,16 @@ class Agent:
         self.closest_coord = None
         self.closest_dist = float('inf')
         self.is_near_target = False
+
+        # check if there are any targets left
+        if not self.targets:
+            return (self.x, self.y)
+        
+        for agent, targets in self.other_targets.items():
+            for target in targets:
+                dist_other_target = self.distance_to(target)
+                if dist_other_target <= 10:
+                    self.send_target_location(target, agent)
 
         # check if there are any targets left
         if self.targets:
