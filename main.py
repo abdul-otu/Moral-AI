@@ -44,7 +44,7 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill((193, 225, 193))
+    screen.fill((230, 236, 245))
     
     for agent in agents:
         agent.move()
@@ -66,7 +66,7 @@ while running:
     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(700, -2, 704, 704), 2)
 
     # Message box
-    pygame.draw.rect(screen, (42, 170, 138), pygame.Rect(702, 0, 700, 700))
+    pygame.draw.rect(screen, (183, 201, 226), pygame.Rect(702, 0, 700, 700))
 
     # Render the messages
     message_y = 15
