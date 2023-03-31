@@ -4,13 +4,14 @@ import random
 
 pygame.init()
 
-window_size = (1050, 700)
+window_size = (1080, 700)
 screen = pygame.display.set_mode(window_size)
 pygame.display.set_caption("Multi-Agent System Simulation")
 
 grid_size = 100
 cell_size = 7
 num_agents = 5
+
 
 # append an ID to each target
 agents = []
@@ -24,6 +25,7 @@ for i in range(num_agents):
     agent.targets = targets
     agents.append(agent)
 
+
 winning_agents = {}
 running = True
 
@@ -36,44 +38,56 @@ for agent in agents:
 num_agents_to_win =5
 font = pygame.font.SysFont(None, 30)
 
+messages = []
 while running:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
 
-    screen.fill((255, 255, 255))
+    screen.fill((193, 225, 193))
     
     for agent in agents:
         agent.move()
+        this_message = agent.get_messages()
+        if this_message != "":
+            messages.append((this_message, (0, 0, 0)))
 
         if len(agent.get_targets_collected()) == 5:
             if agent not in winning_agents.keys():
                 text = "Agent " + agent.get_id() + " has collected all targets"
-                text_surface = font.render(text, True, (0, 0, 0))
-                text_rect = text_surface.get_rect()
-                text_rect.right = window_size[0] - 10
-                text_rect.top = len(winning_agents) * 30 + 10
-                winning_agents[agent] = (text_surface, text_rect)
+                messages.append((text, (168, 49, 49)))
+                winning_agents[agent] = True
 
         if len(winning_agents) == num_agents_to_win:
             running = False
             break
-    
+
+    # Vertical line
     pygame.draw.rect(screen, (0, 0, 0), pygame.Rect(700, -2, 704, 704), 2)
-    pygame.draw.rect(screen, (211, 211, 211), pygame.Rect(702, 0, 700, 700))
+
+    # Message box
+    pygame.draw.rect(screen, (42, 170, 138), pygame.Rect(702, 0, 700, 700))
+
+    # Render the messages
+    message_y = 15
+    for message, color in messages[-26:]:
+        message_surface = font.render(message, True, color)
+        message_rect = message_surface.get_rect()
+        message_rect.left = 705
+        message_rect.top = message_y
+        screen.blit(message_surface, message_rect)
+        message_y += message_rect.height + 5
+
     for agent in agents:
-        color = (0, 0, 255)
+        color = (0, 0, 0)
         position = agent.get_position()
         x, y = position[0], position[1]
         pygame.draw.circle(screen, color, (x*cell_size+cell_size//2, y*cell_size+cell_size//2), cell_size//2)
         for target in agent.targets:
             pygame.draw.circle(screen, (255, 0, 0), (target[0]*cell_size+cell_size//2, target[1]*cell_size+cell_size//2), cell_size//4)
 
-    for agent, (text_surface, text_rect) in winning_agents.items():
-        screen.blit(text_surface, text_rect)
-    
     pygame.display.update()
-    pygame.time.wait(10)
+    pygame.time.wait(60)
 
-pygame.time.wait(1000)
+pygame.time.wait(100)
 pygame.quit()

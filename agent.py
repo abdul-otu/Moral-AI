@@ -16,6 +16,8 @@ class Agent:
         self.other_targets = {}
         self.target_coordinates = []
         self.messages = []
+        self.message_printer = ""
+        self.buffer = ""
 
     def append_coordinates(self, grid_size, detect_range):
         for x in range(detect_range, grid_size, detect_range):
@@ -29,12 +31,20 @@ class Agent:
             if agent != self:
                 self.other_targets[agent] = agent.targets
 
-    def send_target_location(self, target, agent):
+    def send_target_location(self, target, sender):
         remove = target
-        agent.messages.append(target)
-        for agent, targets in self.other_targets.items():
-            self.other_targets[agent] = [target for target in targets if target != remove]
-        
+        sender.messages.append(target)
+        for receiver, targets in self.other_targets.items():
+            if target in targets:
+                self.message_printer = f"[Agent {self.id} to Agent {receiver.id}] Target at {target}"
+                self.other_targets[receiver] = [t for t in targets if t != remove]
+            
+
+    def get_messages(self):
+        self.buffer = self.message_printer
+        self.message_printer = ""
+        return self.buffer
+
     def get_id(self):
         return self.id
     
@@ -48,6 +58,7 @@ class Agent:
         self.targets_collected.append(target)
 
     def move(self):
+        self.messages = list(set(self.messages))
         self.closest_target = None
         self.closest_distance = float('inf')
         self.closest_coord = None
