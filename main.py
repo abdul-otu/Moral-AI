@@ -1,8 +1,17 @@
-import pygame
+import pygame, random, sys
 from agent import Agent
-import random
 
 pygame.init()
+scenario = sys.argv[1]
+num_agents = int(sys.argv[2])
+num_collaborative = sys.argv[3]
+
+
+if scenario == "competitive" or scenario == "compassionate":
+    num_agents_to_win = 1
+elif scenario == "collaborative":
+    num_agents_to_win = num_agents
+
 
 window_size = (1080, 700)
 screen = pygame.display.set_mode(window_size)
@@ -10,20 +19,29 @@ pygame.display.set_caption("Multi-Agent System Simulation")
 
 grid_size = 100
 cell_size = 7
-num_agents = 5
 
 
 # append an ID to each target
 agents = []
+collaborative_count = 0
 for i in range(num_agents):
     x, y = random.randint(0, grid_size-1), random.randint(0, grid_size-1)
-    agent = Agent(chr(65+i), x, y)
+    if num_collaborative == "R":
+        is_collaborative = random.choice([True, False])
+    else:
+        if collaborative_count < int(num_collaborative):
+            is_collaborative = True
+            collaborative_count += 1
+        else:
+            is_collaborative = False
+    agent = Agent(chr(65+i), x, y, scenario, is_collaborative)
     targets = []
     for j in range(5):
         target_x, target_y = random.randint(0, grid_size-1), random.randint(0, grid_size-1)
         targets.append((target_x, target_y))
     agent.targets = targets
     agents.append(agent)
+
 
 
 winning_agents = {}
@@ -33,9 +51,6 @@ running = True
 for agent in agents:
     agent.set_other_agents_targets(agents)
 
-
-#num_agents_to_win = int(input("Enter the number of agents required to win: "))
-num_agents_to_win =5
 font = pygame.font.SysFont(None, 30)
 
 messages = []
@@ -79,15 +94,20 @@ while running:
         message_y += message_rect.height + 5
 
     for agent in agents:
-        color = (0, 0, 0)
+        if agent.is_collaborative:
+            color = (60,179,113)  # green for collaborative agents
+        else:
+            color = (255,69,0) # orange for non-collaborative agents
+            
         position = agent.get_position()
         x, y = position[0], position[1]
+        pygame.draw.circle(screen, (0, 0, 0), (x*cell_size+cell_size//2, y*cell_size+cell_size//2), cell_size//2+1)
         pygame.draw.circle(screen, color, (x*cell_size+cell_size//2, y*cell_size+cell_size//2), cell_size//2)
         for target in agent.targets:
-            pygame.draw.circle(screen, (255, 0, 0), (target[0]*cell_size+cell_size//2, target[1]*cell_size+cell_size//2), cell_size//4)
+            pygame.draw.circle(screen, (72,72,72), (target[0]*cell_size+cell_size//2, target[1]*cell_size+cell_size//2), cell_size//4 +1)
 
     pygame.display.update()
-    pygame.time.wait(60)
+    pygame.time.wait(50)
 
-pygame.time.wait(100)
+pygame.time.wait(500)
 pygame.quit()
