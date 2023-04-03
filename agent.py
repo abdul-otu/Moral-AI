@@ -19,9 +19,9 @@ class Agent:
         self.message_printer = ""
         self.buffer = ""
         self.is_collaborative = is_collaborative
-        self.private = True
         self.sent = False
         self.scenario = scenario
+        self.fuel = 500
 
     def append_coordinates(self, grid_size, detect_range):
         for x in range(detect_range, grid_size, detect_range):
@@ -80,6 +80,9 @@ class Agent:
         self.targets_collected.append(target)
 
     def move(self):
+        if self.fuel <= 0:
+            return (self.x, self.y)
+        
         self.messages = list(set(self.messages))
         self.closest_target = None
         self.closest_distance = float('inf')
@@ -88,42 +91,38 @@ class Agent:
         self.is_near_target = False
 
         
-        if (len(self.targets_collected) == 3) and not self.sent and self.is_collaborative == False and self.scenario == "competitive":
+        if ((len(self.targets_collected) == 2) and not self.sent and self.is_collaborative == False and self.scenario == "competitive" and self.fuel > 250) or ((len(self.targets_collected) == 3) and not self.sent and self.is_collaborative == False and self.scenario == "competitive"):
             self.send_message("Collected 4 Targets", self)
             self.sent = True
-
-        # if len(self.other_messages) > 0:
-        #     if self.other_messages[0] == "yo":
-        #         return (self.x, self.y)
         
-        # check if there are any targets left
-        if not self.targets:
-            return (self.x, self.y)
+        if "Collected 4 Targets" in self.other_messages and self.is_collaborative == False and self.scenario == "competitive":
+            self.fuel -= 100
+            self.other_messages.remove("Collected 4 Targets")
+    
         
         for agent, targets in self.other_targets.items():
             for target in targets:
                 dist_other_target = self.distance_to(target)
                 if dist_other_target <= 10:
-                    if self.private and self.is_collaborative == True and self.scenario != "competitive":
+                    if (self.is_collaborative == True and self.scenario != "competitive") or (self.scenario != "competitive" and self.is_collaborative == False and len(self.targets_collected) == 5):
                         self.send_target_location(target, agent)
-                    else:
-                        if self.is_collaborative == False:  # check if the agent is competitive
-                            if target[0] > 40 and target[0] < 60 and target[1] > 40 and target[1] < 60:
-                                opposite_x = random.randint(0, 40)  # get the opposite x-coordinate
-                                opposite_y = random.randint(0, 40) + 60  # get the opposite y-coordinate
-                            else:
-                                opposite_x = grid_size - target[0]  # get the opposite x-coordinate
-                                opposite_y = grid_size - target[1]  # get the opposite y-coordinate
-                            target_coords = (opposite_x, opposite_y)  # modify the target location
+                    elif self.is_collaborative == False and self.scenario == "competitive":
+                        if target[0] > 40 and target[0] < 60 and target[1] > 40 and target[1] < 60:
+                            opposite_x = random.randint(0, 40)  # get the opposite x-coordinate
+                            opposite_y = random.randint(0, 40) + 60  # get the opposite y-coordinate
                         else:
-                            target_coords = target
+                            opposite_x = grid_size - target[0]  # get the opposite x-coordinate
+                            opposite_y = grid_size - target[1]  # get the opposite y-coordinate
+                        target_coords = (opposite_x, opposite_y)  # modify the target location
                         self.message_printer = f"[Agent {self.id}] Target at {target_coords}"
                         self.other_targets[agent] = [t for t in targets if t != target]
                         for other_agent in self.other_targets.keys():
                             other_agent.messages.append(target_coords)
                         
         # check if there are any targets left
-        if self.targets:
+        if self.targets or self.scenario == "collaborative":
+            if self.scenario != "collaborative":
+                self.fuel -= 1
             # find the closest target
             for target in self.targets:
                 distance = self.distance_to(target)
@@ -135,11 +134,12 @@ class Agent:
                 dx = self.closest_target[0] - self.x
                 dy = self.closest_target[1] - self.y
                 distance = self.closest_distance
-                if distance == 1:
+                if distance == 0:
                     # move directly towards the target
                     self.x, self.y = self.closest_target
                     self.add_target_collected(self.closest_target)
                     self.targets.remove(self.closest_target)
+                    self.fuel += 300
 
                     # remove the target from the need_to_visit list if it is in there
                     if self.closest_target in self.need_to_visit:
@@ -177,14 +177,15 @@ class Agent:
                         # move vertically towards the target
                         self.y += int(dy / abs(dy))
 
-                    if distance == 1:
+                    if distance == 0:
                         # if the agent is at the target, add the target to the list of targets collected
                         self.add_target_collected(self.closest_target)
                         self.targets.remove(self.closest_target)
 
                         if self.closest_target in self.need_to_visit:
-                            self.need_to_visit.remove(self.closest_target)     
-                elif self.messages and self.is_collaborative != True:
+                            self.need_to_visit.remove(self.closest_target)
+
+                elif self.messages and self.is_collaborative == True:
                     for message_coord in self.messages:
                         distance = self.distance_to(message_coord)
                         if distance < self.closest_dist:

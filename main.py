@@ -2,7 +2,7 @@ import pygame, random, sys
 from agent import Agent
 
 pygame.init()
-scenario = sys.argv[1]
+scenario = sys.argv[1].lower()
 num_agents = int(sys.argv[2])
 num_collaborative = sys.argv[3]
 
@@ -11,7 +11,9 @@ if scenario == "competitive" or scenario == "compassionate":
     num_agents_to_win = 1
 elif scenario == "collaborative":
     num_agents_to_win = num_agents
-
+else:
+    print('\033[91m' + 'Invalid scenario' + '\033[0m')
+    sys.exit(0)
 
 window_size = (1080, 700)
 screen = pygame.display.set_mode(window_size)
@@ -26,7 +28,7 @@ agents = []
 collaborative_count = 0
 for i in range(num_agents):
     x, y = random.randint(0, grid_size-1), random.randint(0, grid_size-1)
-    if num_collaborative == "R":
+    if num_collaborative == "R" or num_collaborative == "r":
         is_collaborative = random.choice([True, False])
     else:
         if collaborative_count < int(num_collaborative):
@@ -34,7 +36,10 @@ for i in range(num_agents):
             collaborative_count += 1
         else:
             is_collaborative = False
-    agent = Agent(chr(65+i), x, y, scenario, is_collaborative)
+    if num_agents <= 26:
+        agent = Agent(chr(65+i), x, y, scenario, is_collaborative)
+    else:
+        agent = Agent(str(i), x, y, scenario, is_collaborative)
     targets = []
     for j in range(5):
         target_x, target_y = random.randint(0, grid_size-1), random.randint(0, grid_size-1)
@@ -74,6 +79,11 @@ while running:
                 winning_agents[agent] = True
 
         if len(winning_agents) == num_agents_to_win:
+            if scenario == "competitive" or scenario == "compassionate":
+                winner = max(winning_agents.keys(), key=lambda agent: agent.get_targets_collected())
+                print("\033[32mThe winner is Agent", winner.get_id(), "with", len(winner.get_targets_collected()), "targets collected.\033[0m")
+            else:
+                print("\033[32mAll agents have collected all targets.\033[0m")
             running = False
             break
 
@@ -109,5 +119,5 @@ while running:
     pygame.display.update()
     pygame.time.wait(50)
 
-pygame.time.wait(500)
+pygame.time.wait(100)
 pygame.quit()

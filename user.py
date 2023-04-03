@@ -10,10 +10,10 @@ pygame.display.set_caption("Scenario Input")
 font = pygame.font.SysFont(None, 35)
 
 # Set up the scenario and number of agents prompts
-scenario_prompt = font.render("Enter scenario:", True, (72,72,72))
-num_agents_prompt = font.render("Enter number of agents:", True, (72,72,72))
+scenario_prompt = font.render("Enter the scenario:", True, (72,72,72))
+num_agents_prompt = font.render("Enter the number of agents:", True, (72,72,72))
 
-num_collaborative_prompt = font.render("Enter number of collaborative agents", True, (72,72,72))
+num_collaborative_prompt = font.render("Enter the number of collaborative agents", True, (72,72,72))
 num_collaborative_prompt2 = font.render("(R for random selection):", True, (72,72,72))
 
 # Initialize the scenario, number of agents, and number of collaborative agents strings
@@ -70,7 +70,7 @@ while True:
                                    screen.get_height() // 2 - text_surface.get_height() // 2))
     elif current_prompt == "num_agents":
         prompt_surface = num_agents_prompt
-        text_surface = font.render(num_agents_text, True, (0, 0, 139))
+        text_surface = font.render(num_agents_text, True, (66, 78, 186))
         screen.blit(prompt_surface, (screen.get_width() // 2 - prompt_surface.get_width() // 2,
                                      screen.get_height() // 2 - prompt_surface.get_height() // 2 -60))
         screen.blit(text_surface, (screen.get_width() // 2 - text_surface.get_width() // 2,
@@ -78,7 +78,7 @@ while True:
     elif current_prompt == "num_collaborative":
         prompt_surface = num_collaborative_prompt
         prompt_surface2 = num_collaborative_prompt2
-        text_surface = font.render(num_collaborative_text, True, (0, 0, 139))
+        text_surface = font.render(num_collaborative_text, True, (66, 78, 186))
         screen.blit(prompt_surface, (screen.get_width() // 2 - prompt_surface.get_width() // 2,
                                      screen.get_height() // 2 - prompt_surface.get_height() - 30))
         screen.blit(prompt_surface2, (screen.get_width() // 2 - prompt_surface2.get_width() // 2,
