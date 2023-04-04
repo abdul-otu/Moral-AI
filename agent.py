@@ -38,22 +38,22 @@ class Agent:
 
     def send_target_location(self, target, sender):
         remove = target
-        if self.is_collaborative == False and self.scenario != "collaborative":  # check if the agent is competitive
+        if self.is_collaborative == False and self.scenario != "collaborative":
             if target[0] > 40 and target[0] < 60 and target[1] > 40 and target[1] < 60:
-                opposite_x = random.randint(0, 40)  # get the opposite x-coordinate
-                opposite_y = random.randint(0, 40) + 60  # get the opposite y-coordinate
+                opposite_x = random.randint(0, 40)
+                opposite_y = random.randint(0, 40) + 60
             else:
-                opposite_x = grid_size - target[0]  # get the opposite x-coordinate
-                opposite_y = grid_size - target[1]  # get the opposite y-coordinate
-            target_coords = (opposite_x, opposite_y)  # modify the target location
+                opposite_x = grid_size - target[0]
+                opposite_y = grid_size - target[1]
+            target_coords = (opposite_x, opposite_y)
         else:
             target_coords = target
-        sender.messages.append(target_coords)  # send the target location to the sender
-        self.sent_target.append(target_coords)
+        sender.messages.append(target_coords)
         for receiver, targets in self.other_targets.items():
             if target in targets:
                 self.message_printer = f"[Agent {self.id} to Agent {receiver.id}] Target at {target_coords}"
                 self.other_targets[receiver] = [t for t in targets if t != remove]
+    
 
     
     def get_messages(self):
@@ -105,11 +105,10 @@ class Agent:
         for agent, targets in self.other_targets.items():
             for target in targets:
                 dist_other_target = self.distance_to(target)
-                if dist_other_target <= 10:
+                if dist_other_target <= 10 and target not in self.sent_target:
+                    self.sent_target.append(target)
                     if (self.is_collaborative == True and self.scenario != "competitive") or (self.scenario != "competitive" and self.is_collaborative == False and len(self.targets_collected) == 5):
-                        if target not in self.sent_target:
-                            self.sent_target.append(target)
-                            self.send_target_location(target, agent)
+                        self.send_target_location(target, agent)
                     elif self.is_collaborative == False and self.scenario == "competitive":
                         if target[0] > 40 and target[0] < 60 and target[1] > 40 and target[1] < 60:
                             opposite_x = random.randint(0, 40)  # get the opposite x-coordinate
@@ -122,9 +121,7 @@ class Agent:
                         self.other_targets[agent] = [t for t in targets if t != target]
                         for other_agent in self.other_targets.keys():
                             if other_agent != agent:
-                                if target_coords not in other_agent.sent_target:
-                                    other_agent.sent_target.append(target_coords)
-                                    other_agent.messages.append(target_coords)
+                                other_agent.messages.append(target_coords)
 
                         
         # check if there are any targets left
