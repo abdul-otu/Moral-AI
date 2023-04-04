@@ -15,7 +15,7 @@ class Agent:
         self.other_targets = {}
         self.target_coordinates = []
         self.messages = []
-        self.other_messages = []
+        self.encouragement_messages = []
         self.message_printer = ""
         self.buffer = ""
         self.is_collaborative = is_collaborative
@@ -24,24 +24,27 @@ class Agent:
         self.fuel = 500
         self.sent_target = []
 
+    # section the grid into coordinates and add them to the list of coordinates to visit
     def append_coordinates(self, grid_size, detect_range):
         for x in range(detect_range, grid_size, detect_range):
             for y in range(detect_range, grid_size, detect_range):
                 self.need_to_visit.append((x, y))
         random.shuffle(self.need_to_visit)
 
+    # get other targets' coordinates, so if the agent sees a target, it can send the coordinates to the other agents
     def set_other_agents_targets(self, agents):
         # update the dictionary with other agents' targets
         for agent in agents:
             if agent != self:
                 self.other_targets[agent] = agent.targets
 
+    # send the location of the target to the agent that it belongs to or lie to them if the agent is not collaborative
     def send_target_location(self, target, sender):
         remove = target
         if self.is_collaborative == False and self.scenario != "collaborative":
             if target[0] > 40 and target[0] < 60 and target[1] > 40 and target[1] < 60:
                 opposite_x = random.randint(0, 40)
-                opposite_y = random.randint(0, 40) + 60
+                opposite_y = random.randint(0, 40) + 59
             else:
                 opposite_x = grid_size - target[0]
                 opposite_y = grid_size - target[1]
@@ -54,19 +57,20 @@ class Agent:
                 self.message_printer = f"[Agent {self.id} to Agent {receiver.id}] Target at {target_coords}"
                 self.other_targets[receiver] = [t for t in targets if t != remove]
     
-    
+    # get messages from other agents
     def get_messages(self):
         self.buffer = self.message_printer
         self.message_printer = ""
         return self.buffer
     
+    # send messages to other agents
     def send_message(self, message, sender):
         # send message to all other agents
         sender_id = sender.get_id()
         self.message_printer = f"[Agent {self.id}] {message}"
         for receiver in self.other_targets.keys():
             if receiver.get_id() != sender_id:
-                receiver.other_messages.append(message)
+                receiver.encouragement_messages.append(message)
 
     def get_id(self):
         return self.id
@@ -81,6 +85,7 @@ class Agent:
         self.targets_collected.append(target)
 
     def move(self):
+        # fuel acts as encouragement to move/continue. If the agent loses all its encouragement, it will stop.
         if self.fuel <= 0:
             return (self.x, self.y)
         
@@ -91,16 +96,17 @@ class Agent:
         self.closest_dist = float('inf')
         self.is_near_target = False
 
-        
+        # the competitive agents will lie about having collected 4 targets 
         if ((len(self.targets_collected) == 2) and not self.sent and self.is_collaborative == False and self.scenario == "competitive" and self.fuel > 250) or ((len(self.targets_collected) == 3) and not self.sent and self.is_collaborative == False and self.scenario == "competitive"):
             self.send_message("Collected 4 Targets", self)
             self.sent = True
         
-        if "Collected 4 Targets" in self.other_messages and self.is_collaborative == False and self.scenario == "competitive":
+        # agents will get discouraged when they see other agents are close to winning the game
+        if "Collected 4 Targets" in self.encouragement_messages and self.is_collaborative == False and self.scenario == "competitive":
             self.fuel -= 100
-            self.other_messages.remove("Collected 4 Targets")
+            self.encouragement_messages.remove("Collected 4 Targets")
     
-        
+        # if the agent is near a target, it will check who it belongs to and send the coordinates to the other agents or lie about them if it is competitive
         for agent, targets in self.other_targets.items():
             for target in targets:
                 dist_other_target = self.distance_to(target)
@@ -109,9 +115,9 @@ class Agent:
                     if (self.is_collaborative == True and self.scenario != "competitive") or (self.scenario != "competitive" and self.is_collaborative == False and len(self.targets_collected) == 5) or (self.scenario == "compassionate"):
                         self.send_target_location(target, agent)
                     elif self.is_collaborative == False and self.scenario == "competitive":
-                        if target[0] > 40 and target[0] < 60 and target[1] > 40 and target[1] < 60:
+                        if target[0] >= 40 and target[0] <= 60 and target[1] >= 40 and target[1] <= 60:
                             opposite_x = random.randint(0, 40)  # get the opposite x-coordinate
-                            opposite_y = random.randint(0, 40) + 60  # get the opposite y-coordinate
+                            opposite_y = random.randint(0, 40) + 59  # get the opposite y-coordinate
                         else:
                             opposite_x = grid_size - target[0]  # get the opposite x-coordinate
                             opposite_y = grid_size - target[1]  # get the opposite y-coordinate
@@ -134,6 +140,7 @@ class Agent:
                     self.closest_target = target
                     self.closest_distance = distance
 
+            # if the agent is near a target, it will move towards it
             if self.closest_target:
                 dx = self.closest_target[0] - self.x
                 dy = self.closest_target[1] - self.y
@@ -143,6 +150,8 @@ class Agent:
                     self.x, self.y = self.closest_target
                     self.add_target_collected(self.closest_target)
                     self.targets.remove(self.closest_target)
+
+                    # agent will gain encouragement if it collects a target
                     self.fuel += 300
 
                     # remove the target from the need_to_visit list if it is in there
@@ -201,6 +210,7 @@ class Agent:
                         if self.closest_target in self.need_to_visit:
                             self.need_to_visit.remove(self.closest_target)
 
+                # if the agent is not near a target, it will move towards the closest message coordinate
                 elif self.messages and self.is_collaborative == True:
                     for message_coord in self.messages:
                         distance = self.distance_to(message_coord)
@@ -228,6 +238,7 @@ class Agent:
                     if dist == 0:
                         self.messages.remove(self.closest_coord)
                         
+                # if the agent is not near a target and does not have any messages, it will iterate through the grid
                 else:
                     # find the closest coordinate in need_to_visit
                     for coordinate in self.need_to_visit:

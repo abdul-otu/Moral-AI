@@ -2,18 +2,32 @@ import pygame, random, sys
 from agent import Agent
 
 pygame.init()
+
+# get the arguments from user.py
 scenario = sys.argv[1].lower()
 num_agents = int(sys.argv[2])
 num_collaborative = sys.argv[3]
 
-
+# set the number of agents needed to win the simulation
 if scenario == "competitive" or scenario == "compassionate":
-    num_agents_to_win = 1
+    # edited to make the simulation go to the end
+    num_agents_to_win = num_agents
 elif scenario == "collaborative":
     num_agents_to_win = num_agents
 else:
     print('\033[91m' + 'Invalid scenario' + '\033[0m')
     sys.exit(0)
+
+# check if the number of agents is valid
+if num_agents < 1:
+    print('\033[91m' + 'Invalid number of agents' + '\033[0m')
+    sys.exit(0)
+
+# check if the number of collaborative agents is valid
+if num_collaborative != "R" and num_collaborative != "r":
+    if num_agents < int(num_collaborative):
+        print('\033[91m' + 'Invalid number of collaborative agents' + '\033[0m')
+        sys.exit(0)
 
 window_size = (1080, 700)
 screen = pygame.display.set_mode(window_size)
@@ -21,9 +35,9 @@ pygame.display.set_caption("Multi-Agent System Simulation")
 
 grid_size = 100
 cell_size = 7
+num_targets = 5
 
-
-# append an ID to each target
+# create the agents and their targets randomly on the grid and add them to the list of agents in the simulation
 agents = []
 collaborative_count = 0
 for i in range(num_agents):
@@ -41,13 +55,11 @@ for i in range(num_agents):
     else:
         agent = Agent(str(i), x, y, scenario, is_collaborative)
     targets = []
-    for j in range(5):
+    for j in range(num_targets):
         target_x, target_y = random.randint(0, grid_size-1), random.randint(0, grid_size-1)
         targets.append((target_x, target_y))
     agent.targets = targets
     agents.append(agent)
-
-
 
 winning_agents = {}
 running = True
@@ -71,9 +83,9 @@ while running:
     
     for agent in agents:
         agent.move()
-        this_message = agent.get_messages()
-        if this_message != "":
-            messages.append((this_message, (0, 0, 0)))
+        displayed_messages = agent.get_messages()
+        if displayed_messages != "":
+            messages.append((displayed_messages, (0, 0, 0)))
 
         if len(agent.get_targets_collected()) == 5:
             if agent not in winning_agents.keys():

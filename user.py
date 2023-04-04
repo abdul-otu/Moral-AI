@@ -36,8 +36,8 @@ while True:
                 elif current_prompt == "num_agents":
                     current_prompt = "num_collaborative"
                 elif current_prompt == "num_collaborative":
-                    # If user presses enter, call main.py with the scenario, number of agents, and number of collaborative agents
-                    subprocess.call(["python", "main.py", scenario_text, num_agents_text, num_collaborative_text])
+                    # If user presses enter, call environment.py with the scenario, number of agents, and number of collaborative agents
+                    subprocess.call(["python", "environment.py", scenario_text, num_agents_text, num_collaborative_text])
                     pygame.quit()
                     quit()
             elif event.key == pygame.K_BACKSPACE:
