@@ -54,7 +54,6 @@ class Agent:
                 self.message_printer = f"[Agent {self.id} to Agent {receiver.id}] Target at {target_coords}"
                 self.other_targets[receiver] = [t for t in targets if t != remove]
     
-
     
     def get_messages(self):
         self.buffer = self.message_printer
@@ -107,7 +106,7 @@ class Agent:
                 dist_other_target = self.distance_to(target)
                 if dist_other_target <= 10 and target not in self.sent_target:
                     self.sent_target.append(target)
-                    if (self.is_collaborative == True and self.scenario != "competitive") or (self.scenario != "competitive" and self.is_collaborative == False and len(self.targets_collected) == 5):
+                    if (self.is_collaborative == True and self.scenario != "competitive") or (self.scenario != "competitive" and self.is_collaborative == False and len(self.targets_collected) == 5) or (self.scenario == "compassionate"):
                         self.send_target_location(target, agent)
                     elif self.is_collaborative == False and self.scenario == "competitive":
                         if target[0] > 40 and target[0] < 60 and target[1] > 40 and target[1] < 60:
