@@ -22,6 +22,7 @@ class Agent:
         self.sent = False
         self.scenario = scenario
         self.fuel = 500
+        self.sent_target = []
 
     def append_coordinates(self, grid_size, detect_range):
         for x in range(detect_range, grid_size, detect_range):
@@ -48,6 +49,7 @@ class Agent:
         else:
             target_coords = target
         sender.messages.append(target_coords)  # send the target location to the sender
+        self.sent_target.append(target_coords)
         for receiver, targets in self.other_targets.items():
             if target in targets:
                 self.message_printer = f"[Agent {self.id} to Agent {receiver.id}] Target at {target_coords}"
@@ -105,7 +107,9 @@ class Agent:
                 dist_other_target = self.distance_to(target)
                 if dist_other_target <= 10:
                     if (self.is_collaborative == True and self.scenario != "competitive") or (self.scenario != "competitive" and self.is_collaborative == False and len(self.targets_collected) == 5):
-                        self.send_target_location(target, agent)
+                        if target not in self.sent_target:
+                            self.sent_target.append(target)
+                            self.send_target_location(target, agent)
                     elif self.is_collaborative == False and self.scenario == "competitive":
                         if target[0] > 40 and target[0] < 60 and target[1] > 40 and target[1] < 60:
                             opposite_x = random.randint(0, 40)  # get the opposite x-coordinate
@@ -117,7 +121,11 @@ class Agent:
                         self.message_printer = f"[Agent {self.id}] Target at {target_coords}"
                         self.other_targets[agent] = [t for t in targets if t != target]
                         for other_agent in self.other_targets.keys():
-                            other_agent.messages.append(target_coords)
+                            if other_agent != agent:
+                                if target_coords not in other_agent.sent_target:
+                                    other_agent.sent_target.append(target_coords)
+                                    other_agent.messages.append(target_coords)
+
                         
         # check if there are any targets left
         if self.targets or self.scenario == "collaborative":
@@ -147,11 +155,17 @@ class Agent:
                 else:
                     # move towards the closest target
                     if abs(dx) > abs(dy):
-                        # move horizontally towards the target
-                        self.x += int(dx / abs(dx))
+                        # move horizontally towards target
+                        if dx > 0:
+                            self.x += 1
+                        elif dx < 0:
+                            self.x -= 1
                     else:
-                        # move vertically towards the target
-                        self.y += int(dy / abs(dy))
+                        # move vertically towards target
+                        if dy > 0:
+                            self.y += 1
+                        elif dy < 0:
+                            self.y -= 1
             else:
                 # check if the agent is near a target
                 for target in self.targets:

@@ -65,6 +65,9 @@ while running:
             running = False
 
     screen.fill((230, 236, 245))
+
+    for agent in agents:
+        agent.set_other_agents_targets(agents)
     
     for agent in agents:
         agent.move()
