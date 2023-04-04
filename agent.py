@@ -171,11 +171,17 @@ class Agent:
                     dy = self.closest_target[1] - self.y
                     distance = self.closest_distance
                     if abs(dx) > abs(dy):
-                        # move horizontally towards the target
-                        self.x += int(dx / abs(dx))
+                        # move horizontally towards target
+                        if dx > 0:
+                            self.x += 1
+                        elif dx < 0:
+                            self.x -= 1
                     else:
-                        # move vertically towards the target
-                        self.y += int(dy / abs(dy))
+                        # move vertically towards target
+                        if dy > 0:
+                            self.y += 1
+                        elif dy < 0:
+                            self.y -= 1
 
                     if distance == 0:
                         # if the agent is at the target, add the target to the list of targets collected
