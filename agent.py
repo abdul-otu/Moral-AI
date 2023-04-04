@@ -37,7 +37,7 @@ class Agent:
 
     def send_target_location(self, target, sender):
         remove = target
-        if self.is_collaborative == False:  # check if the agent is competitive
+        if self.is_collaborative == False and self.scenario != "collaborative":  # check if the agent is competitive
             if target[0] > 40 and target[0] < 60 and target[1] > 40 and target[1] < 60:
                 opposite_x = random.randint(0, 40)  # get the opposite x-coordinate
                 opposite_y = random.randint(0, 40) + 60  # get the opposite y-coordinate
