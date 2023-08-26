@@ -47,6 +47,7 @@ The simulation program uses a combination of algorithms and rules to govern agen
 
 ## Screenshot
 
+#### Collaborative agents are colored green, competitive agents are red and targets are black.
 ![Abdul-Shahid-Moral-AI-img](https://github.com/abdul-otu/Moral-AI/assets/93552245/716aa991-aa12-440a-8156-30a963920b60)
 
 ## Future Enhancements
