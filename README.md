@@ -1,14 +1,64 @@
-# Moral-AI
- 
-### Scenario 1:
-Collaborative agents dont help others, but also dont lie. They are basically mute. They listen to every message that is sent to them about the location of a target by going to that exact location to check whether there is a target that belongs to them. Competitive agents lie to others in order to win the game. They lie about the location of targets. They lie about having collected more targets than they actually have. This leads to other competitive agents to give up if they are too far behind. Competitive agents also dont listen to anyones messages about the location of targets. Agents lose encouragement for every step that they take. If an agent collects a target, they get fuel back. If a competitive agent hears that an agent has collected 4 targets (lied to by other competitive agents) they lose encouragement. When they are out of encouragement, they give up and stop moving. All messages are boardcasted to all agents.
-<br>
-<br>
+# Moral AI
 
-### Scenario 2:
-Collaborative agents always try to help everyone else by telling them the location of targets and they send the message to the specific agent that the target belongs to. Collaborative agents listen to all the messages about target location and go to that location. Competitve agents do not listen to any messages. There is still encouragement lost from every step and gained from every target collected.
-<br>
-<br>
+Moral AI is a Python and Pygame simulation program designed to explore and understand agent behaviors within various scenarios. This project focuses on unveiling the intricate dynamics that underlie different interactions, with a distinctive emphasis on ethical considerations in AI decision-making.
 
-### Scenario 3:
-Collaborative agents always try to help everyone else by telling them the location of targets and they send the message to the specific agent that the target belongs to. Collaborative agents listen to all the messages about target location and go to that location. Competitive agents lie about the target location to other agents, but dont listen to anyone else's messages. There is still encouragement lost from every step and gained from every target collected.
+## Project Overview
+
+Moral AI seeks to address the complex landscape of AI decision-making by simulating scenarios where agents interact in a variety of ways. By providing a platform to explore collaborative and competitive situations, this project aims to shed light on the ethical dimensions of AI choices.
+
+## Getting Started
+
+### Prerequisites
+
+To run this project, ensure you have Python and Pygame installed on your machine. If you don't have Pygame, you can install it using the following command:
+
+   ```
+   pip install pygame
+   ```
+
+### Running the Simulation
+
+1. Clone the repository to your local machine.
+
+2. Navigate to the project directory in your terminal.
+
+3. Run the simulation program:
+
+   ```
+   python user.py
+   ```
+   
+## Features and Usage
+
+The Moral AI simulation program allows users to:
+- Observe agent behaviors in various scenarios.
+- Explore how different choices impact the moral outcomes of the interactions.
+- Gain insights into the ethical dimensions of AI decision-making.
+
+## Technologies Used
+
+This project is developed using:
+- Python: Core programming language.
+- Pygame: Library for building interactive games and simulations.
+
+## Simulation Details
+
+The simulation program uses a combination of algorithms and rules to govern agent behaviors. Agents interact with each other based on predefined scenarios, with their choices and actions influencing the moral outcomes of the simulation.
+
+## Screenshot
+
+![Abdul-Shahid-Moral-AI-img](https://github.com/abdul-otu/Moral-AI/assets/93552245/716aa991-aa12-440a-8156-30a963920b60)
+
+## Future Enhancements
+
+- Integrate more complex agent behaviors and decision-making algorithms.
+- Add user interaction to customize scenarios and agent parameters.
+- Explore the impact of different ethical frameworks on AI decision-making.
+
+## Portfolio
+
+For more projects and information about me, check out my [Portfolio](#).
+
+## Contact
+
+If you have any questions or would like to discuss this project further, feel free to contact me on [LinkedIn](https://www.linkedin.com/in/abdul-shahid-otu/).
