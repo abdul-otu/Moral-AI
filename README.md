@@ -50,12 +50,6 @@ The simulation program uses a combination of algorithms and rules to govern agen
 #### Collaborative agents are colored green, competitive agents are red and targets are black.
 ![Abdul-Shahid-Moral-AI-img](https://github.com/abdul-otu/Moral-AI/assets/93552245/716aa991-aa12-440a-8156-30a963920b60)
 
-## Future Enhancements
-
-- Integrate more complex agent behaviors and decision-making algorithms.
-- Add user interaction to customize scenarios and agent parameters.
-- Explore the impact of different ethical frameworks on AI decision-making.
-
 ## Portfolio
 
 For more projects and information about me, check out my [Portfolio](#).
