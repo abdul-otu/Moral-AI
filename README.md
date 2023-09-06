@@ -52,7 +52,7 @@ The simulation program uses a combination of algorithms and rules to govern agen
 
 ## Portfolio
 
-For more projects and information about me, check out my [Portfolio](#).
+For more projects and information about me, check out my [Portfolio](https://abdulshahid.net/).
 
 ## Contact
 
